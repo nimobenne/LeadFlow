@@ -1,0 +1,160 @@
+:root {
+  color-scheme: dark;
+  --bg: #050816;
+  --card: #101934;
+  --text: #e9eeff;
+  --muted: #b8c5ff;
+  --primary: #6d8dff;
+  --primary-strong: #8ea6ff;
+  --success: #6ff0a4;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  background: radial-gradient(circle at top, #1b2a5f 0, var(--bg) 42%);
+  color: var(--text);
+}
+
+main {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+
+.hero,
+.reviews,
+.checkout {
+  background: color-mix(in oklab, var(--card), black 15%);
+  border: 1px solid #2b3a73;
+  border-radius: 22px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.badge {
+  display: inline-block;
+  background: #24356f;
+  color: var(--muted);
+  border: 1px solid #3e56ab;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.subtitle {
+  max-width: 60ch;
+  line-height: 1.6;
+  color: #d6dfff;
+}
+
+.rating-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.stars {
+  color: #7182be;
+  font-size: 1.1rem;
+}
+
+.star.filled {
+  color: #ffd36d;
+}
+
+.hero-cta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.price span {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.button-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: linear-gradient(120deg, var(--primary), var(--primary-strong));
+  color: #06133e;
+  font-weight: 700;
+  padding: 0.85rem 1.15rem;
+  border-radius: 10px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.value-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-bottom: 1.5rem;
+}
+
+.value-grid article {
+  background: #0f1a3d;
+  border: 1px solid #28396f;
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.value-grid h3 {
+  margin: 0 0 0.5rem;
+  color: var(--success);
+}
+
+.review-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.review-card {
+  background: #0b1532;
+  border: 1px solid #263666;
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.checkout {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+input {
+  border: 1px solid #33467f;
+  border-radius: 10px;
+  background: #0a122c;
+  color: var(--text);
+  padding: 0.7rem;
+  margin-bottom: 0.5rem;
+}
+
+.status {
+  color: var(--success);
+  font-weight: 600;
+  margin: 0.5rem 0 0;
+}
