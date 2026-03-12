@@ -15,7 +15,6 @@ import type { Job } from '@/lib/types'
 export default function RunsPage() {
   const [activeJobId, setActiveJobId] = useState<string | null>(null)
   const [recentJobs, setRecentJobs] = useState<Job[]>([])
-  const [daemonOnline, setDaemonOnline] = useState<boolean | null>(null)
 
   // Load recent jobs on mount
   useEffect(() => {
@@ -28,26 +27,6 @@ export default function RunsPage() {
       if (data) setRecentJobs(data as Job[])
     }
     loadJobs()
-  }, [])
-
-  // Sync daemon status for RunForm's disabled state
-  useEffect(() => {
-    async function checkDaemon() {
-      const { data } = await supabase
-        .from('daemon_status')
-        .select('last_seen_at')
-        .eq('id', 1)
-        .single()
-      if (!data) {
-        setDaemonOnline(false)
-        return
-      }
-      const ageSeconds = (Date.now() - new Date(data.last_seen_at as string).getTime()) / 1000
-      setDaemonOnline(ageSeconds < 60)
-    }
-    checkDaemon()
-    const interval = setInterval(checkDaemon, 15_000)
-    return () => clearInterval(interval)
   }, [])
 
   function handleRunStarted(jobId: string) {
@@ -97,7 +76,7 @@ export default function RunsPage() {
           <div>
             <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
               <h2 className="text-base font-semibold text-white mb-5">Configure Pipeline Run</h2>
-              <RunForm onRunStarted={handleRunStarted} daemonOnline={daemonOnline} />
+              <RunForm onRunStarted={handleRunStarted} />
             </div>
 
             {/* Recent jobs */}

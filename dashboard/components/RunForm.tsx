@@ -3,21 +3,18 @@
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { X, ChevronDown, Search } from 'lucide-react'
-import { supabase } from '@/lib/supabase'
 import { UK_CITIES } from '@/lib/uk-cities'
 
 interface RunFormProps {
-  /** Called with the new job ID once the run is inserted into Supabase. */
+  /** Called with the new job ID once the run is triggered. */
   onRunStarted: (jobId: string) => void
-  /** Whether the daemon is currently online. Disables submit when false. */
-  daemonOnline: boolean | null
 }
 
 /**
  * Form to configure and trigger a new pipeline run.
  * Inserts a job record into the `jobs` table on submit.
  */
-export default function RunForm({ onRunStarted, daemonOnline }: RunFormProps) {
+export default function RunForm({ onRunStarted }: RunFormProps) {
   const router = useRouter()
 
   const [selectedCities, setSelectedCities] = useState<string[]>([])
@@ -63,28 +60,29 @@ export default function RunForm({ onRunStarted, daemonOnline }: RunFormProps) {
     setSubmitting(true)
     setError(null)
 
-    const { data, error: insertError } = await supabase
-      .from('jobs')
-      .insert({
-        status: 'pending',
+    const res = await fetch('/api/trigger', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
         cities: selectedCities,
         lead_limit: leadLimit,
         force_refresh: forceRefresh,
-      })
-      .select('id')
-      .single()
+      }),
+    })
 
-    if (insertError || !data) {
-      setError(insertError?.message ?? 'Failed to create job.')
+    const json = await res.json()
+
+    if (!res.ok || !json.job_id) {
+      setError(json.error ?? 'Failed to trigger pipeline.')
       setSubmitting(false)
       return
     }
 
-    onRunStarted(data.id as string)
+    onRunStarted(json.job_id as string)
     setSubmitting(false)
   }
 
-  const canSubmit = daemonOnline === true && selectedCities.length > 0 && !submitting
+  const canSubmit = selectedCities.length > 0 && !submitting
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -251,12 +249,6 @@ export default function RunForm({ onRunStarted, daemonOnline }: RunFormProps) {
         </p>
       )}
 
-      {/* Daemon offline warning */}
-      {daemonOnline === false && (
-        <p className="text-sm text-amber-400 bg-amber-950/50 border border-amber-800 rounded-lg px-3 py-2">
-          The daemon must be running before you can start a pipeline run.
-        </p>
-      )}
 
       <button
         type="submit"
