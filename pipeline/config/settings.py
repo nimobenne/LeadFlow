@@ -88,14 +88,14 @@ STALE_JOB_THRESHOLD_SECONDS: int = 7200  # 2 hours
 # Lead staleness window for dedup (days)
 LEAD_STALENESS_DAYS: int = 30
 
-# Yell.com search URL template
-YELL_SEARCH_URL: str = (
-    "https://www.yell.com/ucs/UcsSearchAction.do"
-    "?keywords={keyword}&location={city}"
+# FreeIndex.co.uk search URL template
+FREEINDEX_SEARCH_URL: str = (
+    "https://www.freeindex.co.uk/search.htm"
+    "?query={keyword}&region={city}"
 )
 
-# Keywords to search on Yell
-YELL_KEYWORDS: list[str] = ["barbershop", "hair+salon"]
+# Keywords to search on FreeIndex
+FREEINDEX_KEYWORDS: list[str] = ["barbershop", "hair salon"]
 
-# Max pages to paginate per Yell search
-YELL_MAX_PAGES: int = 5
+# Max pages to paginate per FreeIndex search
+FREEINDEX_MAX_PAGES: int = 5
