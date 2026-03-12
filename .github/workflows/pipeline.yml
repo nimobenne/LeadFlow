@@ -59,3 +59,11 @@ jobs:
           PIPELINE_JOB_ID: ${{ inputs.job_id }}
           CONCURRENCY: '3'
         run: python run_job.py
+
+      - name: Upload debug artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-output
+          path: pipeline/data/
+          if-no-files-found: ignore

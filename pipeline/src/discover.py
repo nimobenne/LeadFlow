@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import random
 import re
 from typing import Optional
@@ -256,6 +257,25 @@ async def _scrape_keyword(
 
             # --- Parse listings ---
             page_leads = await _parse_listings(page, city, force_refresh)
+
+            # Debug: dump HTML and screenshot when no results found on page 1
+            if page_num == 1 and not page_leads:
+                try:
+                    html = await page.content()
+                    debug_html_path = os.path.join(
+                        os.path.dirname(__file__), "..", "data", f"debug_{city}_{keyword}.html"
+                    )
+                    os.makedirs(os.path.dirname(debug_html_path), exist_ok=True)
+                    with open(debug_html_path, "w", encoding="utf-8") as f:
+                        f.write(html)
+                    logger.info("Debug HTML saved to %s", debug_html_path)
+                    await page.screenshot(
+                        path=debug_html_path.replace(".html", ".png"), full_page=False
+                    )
+                    logger.info("Debug screenshot saved.")
+                except Exception as dbg_exc:
+                    logger.debug("Debug dump failed: %s", dbg_exc)
+
             await page.close()
 
             for lead in page_leads:
