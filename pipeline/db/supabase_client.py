@@ -154,6 +154,22 @@ def reset_stale_jobs() -> None:
 # ---------------------------------------------------------------------------
 
 
+# Exact set of columns in the leads table schema
+_LEAD_COLUMNS = {
+    "id", "job_id", "stage", "outreach_status", "created_at",
+    "business_name", "business_type", "city", "country", "website",
+    "google_maps_url", "address", "phone", "instagram_url", "yell_listing_url",
+    "booking_url", "booking_platform", "whatsapp_present", "has_chat_widget",
+    "has_contact_form", "book_now_above_fold", "mobile_cta_strength",
+    "services_visible", "pricing_visible", "language_detected",
+    "decision_maker_name", "decision_maker_role", "personal_email", "generic_email",
+    "email_source_url", "source_type", "domain", "mx_valid", "mailbox_status",
+    "catch_all", "role_based", "last_verified_at", "confidence_score", "fit_score",
+    "priority_score", "pricing_fit", "likely_missed_lead_issue", "personalization_note",
+    "outreach_angle", "notes",
+}
+
+
 def save_lead(lead_dict: dict) -> Optional[dict]:
     """
     Upsert a lead into the `leads` table.
@@ -162,15 +178,14 @@ def save_lead(lead_dict: dict) -> Optional[dict]:
     """
     try:
         client = get_client()
-        # Ensure timestamps are set
-        now = _now_iso()
-        lead_dict.setdefault("created_at", now)
-        lead_dict["updated_at"] = now
+        # Strip any fields not in the schema to avoid PGRST204 errors
+        clean = {k: v for k, v in lead_dict.items() if k in _LEAD_COLUMNS}
+        clean.setdefault("created_at", _now_iso())
 
         result = (
             client.table("leads")
             .upsert(
-                lead_dict,
+                clean,
                 on_conflict="domain,city",
                 returning="representation",
             )
