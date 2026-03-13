@@ -203,6 +203,13 @@ async def _scrape_category(
         results = await _parse_listings(page, city, quota, force_refresh)
         await page.close()
 
+        # Enrich each lead by visiting its FreeIndex profile page to get website + phone
+        enriched: list[dict] = []
+        for lead in results:
+            enriched.append(await _enrich_from_profile_page(lead, context))
+            await asyncio.sleep(random.uniform(0.5, 1.0))
+        results = enriched
+
     finally:
         await context.close()
 
@@ -381,6 +388,57 @@ async def _save_debug(page: Page, city: str, label: str) -> None:
         logger.info("Debug saved: %s", html_path)
     except Exception as exc:
         logger.debug("Debug save failed: %s", exc)
+
+
+async def _enrich_from_profile_page(lead: dict, context: BrowserContext) -> dict:
+    """
+    Visit the FreeIndex profile page to extract the real website URL and phone
+    number — these are not visible on the category listing page.
+    """
+    profile_url = lead.get("yell_listing_url", "")
+    if not profile_url or not profile_url.startswith("http"):
+        return lead
+
+    page = None
+    try:
+        page = await context.new_page()
+        try:
+            await page.goto(profile_url, timeout=10000, wait_until="domcontentloaded")
+        except PlaywrightTimeout:
+            return lead
+
+        # Extract website: find any external (non-freeindex) link on the profile
+        if not lead.get("website"):
+            try:
+                for link_el in await page.query_selector_all("a[href^='http']"):
+                    href = await link_el.get_attribute("href") or ""
+                    if href and "freeindex.co.uk" not in href and href.startswith("http"):
+                        lead["website"] = href.strip()
+                        lead["domain"] = _extract_root_domain(href)
+                        break
+            except Exception:
+                pass
+
+        # Extract phone if not already found from the listing card
+        if not lead.get("phone"):
+            try:
+                tel_link = await page.query_selector("a[href^='tel:']")
+                if tel_link:
+                    raw = (await tel_link.get_attribute("href") or "").replace("tel:", "").strip()
+                    lead["phone"] = _normalise_phone(raw)
+            except Exception:
+                pass
+
+    except Exception as exc:
+        logger.debug("Profile enrichment failed for %s: %s", lead.get("business_name"), exc)
+    finally:
+        if page:
+            try:
+                await page.close()
+            except Exception:
+                pass
+
+    return lead
 
 
 def _extract_root_domain(url: str) -> str:

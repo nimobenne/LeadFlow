@@ -280,8 +280,8 @@ def _compute_confidence_score(lead: dict) -> int:
         if best_email:
             score -= 25
 
-    # -15 third-party directory only (source_type != "yell" AND no real website)
-    if source_type != "yell" and not website:
+    # -15 directory listing only (no real website found regardless of source)
+    if not website:
         score -= 15
 
     return score
