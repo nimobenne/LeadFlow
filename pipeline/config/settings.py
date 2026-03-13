@@ -88,14 +88,12 @@ STALE_JOB_THRESHOLD_SECONDS: int = 7200  # 2 hours
 # Lead staleness window for dedup (days)
 LEAD_STALENESS_DAYS: int = 30
 
-# FreeIndex.co.uk search URL template — uses SEO path format
-# e.g. https://www.freeindex.co.uk/search/(barbershop)_(london)/
-FREEINDEX_SEARCH_URL: str = (
-    "https://www.freeindex.co.uk/search/({keyword})_({city})/"
-)
+# FreeIndex.co.uk category URLs for barbers and hairdressers
+# e.g. https://www.freeindex.co.uk/categories/health_and_beauty/hair_care/barbers/(london)/
+FREEINDEX_CATEGORIES: list[str] = [
+    "https://www.freeindex.co.uk/categories/health_and_beauty/hair_care/barbers/({city})/",
+    "https://www.freeindex.co.uk/categories/health_and_beauty/hair_care/hairdressers/({city})/",
+]
 
-# Keywords to search on FreeIndex
-FREEINDEX_KEYWORDS: list[str] = ["barbershop", "hair salon"]
-
-# Max pages to paginate per FreeIndex search
-FREEINDEX_MAX_PAGES: int = 5
+# Max "Load More" clicks per category page
+FREEINDEX_MAX_LOAD_MORE: int = 4
