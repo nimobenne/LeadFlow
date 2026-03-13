@@ -391,12 +391,13 @@ async def _extract_listing(el, page: Page, city: str) -> Optional[dict]:
 
 def _build_url(keyword: str, city: str, page: int) -> str:
     """Build a FreeIndex search URL."""
-    url = FREEINDEX_SEARCH_URL.format(
-        keyword=keyword.replace(" ", "+"),
-        city=city.replace(" ", "+"),
-    )
+    # FreeIndex path format: /search/(keyword)_(city)/
+    # Spaces become hyphens in the path
+    kw = keyword.lower().replace(" ", "-")
+    ct = city.lower().replace(" ", "-")
+    url = FREEINDEX_SEARCH_URL.format(keyword=kw, city=ct)
     if page > 1:
-        url = f"{url}&page={page}"
+        url = f"{url}?page={page}"
     return url
 
 

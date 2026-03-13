@@ -88,10 +88,10 @@ STALE_JOB_THRESHOLD_SECONDS: int = 7200  # 2 hours
 # Lead staleness window for dedup (days)
 LEAD_STALENESS_DAYS: int = 30
 
-# FreeIndex.co.uk search URL template
+# FreeIndex.co.uk search URL template — uses SEO path format
+# e.g. https://www.freeindex.co.uk/search/(barbershop)_(london)/
 FREEINDEX_SEARCH_URL: str = (
-    "https://www.freeindex.co.uk/search.htm"
-    "?query={keyword}&region={city}"
+    "https://www.freeindex.co.uk/search/({keyword})_({city})/"
 )
 
 # Keywords to search on FreeIndex
