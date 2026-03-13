@@ -187,7 +187,6 @@ def save_lead(lead_dict: dict) -> Optional[dict]:
             .upsert(
                 clean,
                 on_conflict="domain,city",
-                returning="representation",
             )
             .execute()
         )

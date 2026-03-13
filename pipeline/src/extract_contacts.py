@@ -89,7 +89,6 @@ def extract_contacts(lead: dict) -> dict:
             "domain": domain,
             "personal_email": personal_email or "",
             "generic_email": generic_email or "",
-            "best_email": best_email or "",
             "email_source_url": email_source_url,
             "stage": "contacts_extracted",
         }
