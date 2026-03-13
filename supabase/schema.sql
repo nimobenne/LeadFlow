@@ -104,7 +104,8 @@ alter publication supabase_realtime add table leads;
 alter publication supabase_realtime add table progress_events;
 
 -- Unique constraint for upsert deduplication in pipeline
-create unique index if not exists leads_domain_city_unique on leads(domain, city) where domain is not null;
+-- Must be a full (non-partial) index — PostgREST cannot use partial indexes as conflict targets
+create unique index if not exists leads_domain_city_unique on leads(domain, city);
 
 -- Indexes for common query patterns
 create index if not exists leads_job_id_idx on leads(job_id);

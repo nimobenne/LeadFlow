@@ -181,15 +181,19 @@ def save_lead(lead_dict: dict) -> Optional[dict]:
         # Strip any fields not in the schema to avoid PGRST204 errors
         clean = {k: v for k, v in lead_dict.items() if k in _LEAD_COLUMNS}
         clean.setdefault("created_at", _now_iso())
+        # Treat empty domain as None so no-website leads don't false-conflict
+        if not clean.get("domain"):
+            clean["domain"] = None
 
-        result = (
-            client.table("leads")
-            .upsert(
-                clean,
-                on_conflict="domain,city",
+        # Use upsert only when domain is known; otherwise plain insert
+        if clean.get("domain"):
+            result = (
+                client.table("leads")
+                .upsert(clean, on_conflict="domain,city")
+                .execute()
             )
-            .execute()
-        )
+        else:
+            result = client.table("leads").insert(clean).execute()
         rows = result.data or []
         saved = rows[0] if rows else None
         if saved:
